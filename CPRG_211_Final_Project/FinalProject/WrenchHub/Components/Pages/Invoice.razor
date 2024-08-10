@@ -1,0 +1,290 @@
+﻿@page "/invoice"
+@using System.Collections.Generic
+@using System.IO
+@using System.Linq
+@using iText.Kernel.Pdf
+@using iText.Layout
+@using iText.Layout.Element
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3>Invoice Management</h3>
+
+    <!-- Find Invoice Section -->
+    <div class="find-invoice-section">
+        <h4>Find Invoice</h4>
+        <div class="input-group">
+            <label for="invoice-id">Invoice ID:</label>
+            <input type="text" id="invoice-id" @bind="searchInvoiceId" placeholder="Enter Invoice ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="appointment-id">Appointment ID:</label>
+            <input type="text" id="appointment-id" @bind="searchAppointmentId" placeholder="Enter Appointment ID">
+        </div>
+        <div class="input-group">
+            <label for="date-issued">Date Issued:</label>
+            <input type="date" id="date-issued" @bind="searchDateIssued">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="FindInvoice">Find Invoice</button>
+        </div>
+
+        <div class="invoice-results">
+            @if (!string.IsNullOrEmpty(invoiceErrorMessage))
+            {
+                <p class="error-message">@invoiceErrorMessage</p>
+            }
+            else if (foundInvoice != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Customer ID</th>
+                            <th>Appointment ID</th>
+                            <th>Labor Cost</th>
+                            <th>Parts Cost</th>
+                            <th>Total Cost</th>
+                            <th>Date Issued</th>
+                            <th>Date Paid</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@foundInvoice.InvoiceId</td>
+                            <td>@foundInvoice.CustomerId</td>
+                            <td>@foundInvoice.AppointmentId</td>
+                            <td>@foundInvoice.LaborCost</td>
+                            <td>@foundInvoice.PartsCost</td>
+                            <td>@foundInvoice.TotalCost</td>
+                            <td>@foundInvoice.DateIssued.ToShortDateString()</td>
+                            <td>@foundInvoice.DatePaid?.ToShortDateString()</td>
+                            <td>
+                                <button class="btn btn-secondary" @onclick="EditInvoice">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Add Invoice Section -->
+    <div class="add-invoice-section">
+        <h4>@(isEditing ? "Edit Invoice" : "Generate New Invoice")</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-invoice-id">Invoice ID:</label>
+                <input type="text" id="new-invoice-id" @bind="newInvoiceId" placeholder="Enter Invoice ID" disabled="@isEditing">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-appointment-id">Appointment ID:</label>
+                <input type="text" id="new-appointment-id" @bind="newAppointmentId" placeholder="Enter Appointment ID">
+            </div>
+            <div class="input-group">
+                <label for="new-labor-cost">Labor Cost:</label>
+                <input type="text" id="new-labor-cost" @bind="newLaborCost" placeholder="Enter Labor Cost ($)">
+            </div>
+            <div class="input-group">
+                <label for="new-parts-cost">Parts Cost:</label>
+                <input type="text" id="new-parts-cost" @bind="newPartsCost" placeholder="Enter Parts Cost ($)">
+            </div>
+            <div class="input-group">
+                <label for="new-total-cost">Total Cost:</label>
+                <input type="text" id="new-total-cost" @bind="newTotalCost" placeholder="Enter Total Cost ($)" disabled>
+            </div>
+            <div class="input-group">
+                <label for="new-date-issued">Date Issued:</label>
+                <input type="date" id="new-date-issued" @bind="newDateIssued">
+            </div>
+            <div class="input-group">
+                <label for="new-date-paid">Date Paid:</label>
+                <input type="date" id="new-date-paid" @bind="newDatePaid">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="@(isEditing ? UpdateInvoice : GenerateInvoice)">
+                @(isEditing ? "Update Invoice" : "Generate Invoice")
+            </button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addInvoiceSuccessMessage))
+        {
+            <div class="alert alert-success">@addInvoiceSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addInvoiceErrorMessage))
+        {
+            <div class="alert alert-danger">@addInvoiceErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+  
+    string searchInvoiceId;
+    string searchCustomerId;
+    string searchAppointmentId;
+    DateTime? searchDateIssued;
+    InvoiceModel foundInvoice;
+    string invoiceErrorMessage;
+
+
+    string newInvoiceId;
+    string newCustomerId;
+    string newAppointmentId;
+    string newLaborCost;
+    string newPartsCost;
+    string newTotalCost;
+    DateTime? newDateIssued;
+    DateTime? newDatePaid;
+    string addInvoiceSuccessMessage;
+    string addInvoiceErrorMessage;
+    bool isEditing;
+
+    
+    List<InvoiceModel> invoices = new List<InvoiceModel>();
+
+    private void FindInvoice()
+    {
+        try
+        {
+            invoiceErrorMessage = string.Empty;
+            foundInvoice = invoices.FirstOrDefault(i =>
+                (string.IsNullOrEmpty(searchInvoiceId) || i.InvoiceId == searchInvoiceId) &&
+                (string.IsNullOrEmpty(searchCustomerId) || i.CustomerId == searchCustomerId) &&
+                (string.IsNullOrEmpty(searchAppointmentId) || i.AppointmentId == searchAppointmentId) &&
+                (!searchDateIssued.HasValue || i.DateIssued.Date == searchDateIssued.Value.Date));
+
+            if (foundInvoice == null)
+            {
+                invoiceErrorMessage = "No invoice found.";
+            }
+        }
+        catch (Exception e)
+        {
+            invoiceErrorMessage = $"Error finding invoice: {e.Message}";
+        }
+    }
+
+    private void GenerateInvoice()
+    {
+        try
+        {
+            addInvoiceSuccessMessage = string.Empty;
+            addInvoiceErrorMessage = string.Empty;
+
+            newTotalCost = (decimal.Parse(newLaborCost) + decimal.Parse(newPartsCost)).ToString();
+
+            var newInvoice = new InvoiceModel
+                {
+                    InvoiceId = newInvoiceId,
+                    CustomerId = newCustomerId,
+                    AppointmentId = newAppointmentId,
+                    LaborCost = newLaborCost,
+                    PartsCost = newPartsCost,
+                    TotalCost = newTotalCost,
+                    DateIssued = newDateIssued ?? DateTime.Now,
+                    DatePaid = newDatePaid
+                };
+
+            invoices.Add(newInvoice);
+            SaveInvoiceAsPdf(newInvoice);
+
+            addInvoiceSuccessMessage = "Invoice successfully generated and saved!";
+        }
+        catch (Exception e)
+        {
+            addInvoiceErrorMessage = $"Error generating invoice: {e.Message}";
+        }
+    }
+
+    private void SaveInvoiceAsPdf(InvoiceModel invoice)
+    {
+        try
+        {
+            string pdfPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\..\\..\\..\\Resources\\Res", $"{invoice.InvoiceId}.pdf");
+            using (var writer = new PdfWriter(pdfPath))
+            using (var pdf = new PdfDocument(writer))
+            using (var document = new Document(pdf))
+            {
+                document.Add(new iText.Layout.Element.Paragraph("Invoice"));
+                document.Add(new iText.Layout.Element.Paragraph($"Invoice ID: {invoice.InvoiceId}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Customer ID: {invoice.CustomerId}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Appointment ID: {invoice.AppointmentId}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Labor Cost: {invoice.LaborCost}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Parts Cost: {invoice.PartsCost}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Total Cost: {invoice.TotalCost}"));
+                document.Add(new iText.Layout.Element.Paragraph($"Date Issued: {invoice.DateIssued.ToShortDateString()}"));
+                if (invoice.DatePaid.HasValue)
+                {
+                    document.Add(new iText.Layout.Element.Paragraph($"Date Paid: {invoice.DatePaid.Value.ToShortDateString()}"));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            addInvoiceErrorMessage = $"Error saving invoice as PDF: {e.Message}";
+        }
+    }
+
+    private void EditInvoice()
+    {
+        if (foundInvoice != null)
+        {
+            isEditing = true;
+            newInvoiceId = foundInvoice.InvoiceId;
+            newCustomerId = foundInvoice.CustomerId;
+            newAppointmentId = foundInvoice.AppointmentId;
+            newLaborCost = foundInvoice.LaborCost;
+            newPartsCost = foundInvoice.PartsCost;
+            newTotalCost = foundInvoice.TotalCost;
+            newDateIssued = foundInvoice.DateIssued;
+            newDatePaid = foundInvoice.DatePaid;
+        }
+    }
+
+    private void UpdateInvoice()
+    {
+        try
+        {
+            addInvoiceSuccessMessage = string.Empty;
+            addInvoiceErrorMessage = string.Empty;
+
+            foundInvoice.CustomerId = newCustomerId;
+            foundInvoice.AppointmentId = newAppointmentId;
+            foundInvoice.LaborCost = newLaborCost;
+            foundInvoice.PartsCost = newPartsCost;
+            foundInvoice.TotalCost = (decimal.Parse(newLaborCost) + decimal.Parse(newPartsCost)).ToString();
+            foundInvoice.DateIssued = newDateIssued ?? DateTime.Now;
+            foundInvoice.DatePaid = newDatePaid;
+
+            SaveInvoiceAsPdf(foundInvoice);
+
+            addInvoiceSuccessMessage = "Invoice successfully updated!";
+        }
+        catch (Exception e)
+        {
+            addInvoiceErrorMessage = $"Error updating invoice: {e.Message}";
+        }
+    }
+
+  
+    public class InvoiceModel
+    {
+        public string InvoiceId { get; set; }
+        public string CustomerId { get; set; }
+        public string AppointmentId { get; set; }
+        public string LaborCost { get; set; }
+        public string PartsCost { get; set; }
+        public string TotalCost { get; set; }
+        public DateTime DateIssued { get; set; }
+        public DateTime? DatePaid { get; set; }
+    }
+}

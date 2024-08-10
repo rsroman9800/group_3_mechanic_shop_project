@@ -1,0 +1,173 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\_imports.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\layout\\navmenu.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\vehicles.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\vehicles.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\vehicles.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\vehicles.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\invoice.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\invoice.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\invoice.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\invoice.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\home.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\home.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\customers.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\customers.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|c:\\users\\kiit\\desktop\\database\\cprg_211_final_project\\finalproject\\wrenchhub\\components\\pages\\customers.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{952CFF35-8D8C-492B-808C-9657239AD043}|TravelApp.csproj|solutionrelative:components\\pages\\customers.razor.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "NavMenu.razor",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Layout\\NavMenu.razor",
+              "RelativeDocumentMoniker": "Components\\Layout\\NavMenu.razor",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Layout\\NavMenu.razor",
+              "RelativeToolTip": "Components\\Layout\\NavMenu.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABUAAAAzAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-10T09:37:32.357Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "_Imports.razor",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\_Imports.razor",
+              "RelativeDocumentMoniker": "Components\\_Imports.razor",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\_Imports.razor",
+              "RelativeToolTip": "Components\\_Imports.razor",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAQAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-10T09:37:19.76Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Vehicles.razor.css",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Vehicles.razor.css",
+              "RelativeDocumentMoniker": "Components\\Pages\\Vehicles.razor.css",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Vehicles.razor.css",
+              "RelativeToolTip": "Components\\Pages\\Vehicles.razor.css",
+              "ViewState": "AQIAAFoAAAAAAAAAAAAAAG4AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-08-10T09:37:03.28Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Vehicles.razor",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Vehicles.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Vehicles.razor",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Vehicles.razor",
+              "RelativeToolTip": "Components\\Pages\\Vehicles.razor",
+              "ViewState": "AQIAANsAAAAAAAAAAAAAAPoAAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-10T09:35:49.361Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Invoice.razor.css",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Invoice.razor.css",
+              "RelativeDocumentMoniker": "Components\\Pages\\Invoice.razor.css",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Invoice.razor.css",
+              "RelativeToolTip": "Components\\Pages\\Invoice.razor.css",
+              "ViewState": "AQIAAGMAAAAAAAAAAAAAAG0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-08-10T09:35:35.09Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Invoice.razor",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Invoice.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Invoice.razor",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Invoice.razor",
+              "RelativeToolTip": "Components\\Pages\\Invoice.razor",
+              "ViewState": "AQIAAPYAAAAAAAAAAAAAABUBAAACAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-10T09:34:58.945Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Home.razor.css",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Home.razor.css",
+              "RelativeDocumentMoniker": "Components\\Pages\\Home.razor.css",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Home.razor.css",
+              "RelativeToolTip": "Components\\Pages\\Home.razor.css",
+              "ViewState": "AQIAAAkAAAAAAAAAAAAAAB8AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-08-10T09:34:43.41Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "Customers.razor.css",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Customers.razor.css",
+              "RelativeDocumentMoniker": "Components\\Pages\\Customers.razor.css",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Customers.razor.css",
+              "RelativeToolTip": "Components\\Pages\\Customers.razor.css",
+              "ViewState": "AQIAAGAAAAAAAAAAAAAAAG4AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2024-08-10T09:34:16.082Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Customers.razor",
+              "DocumentMoniker": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Customers.razor",
+              "RelativeDocumentMoniker": "Components\\Pages\\Customers.razor",
+              "ToolTip": "C:\\Users\\KIIT\\Desktop\\Database\\CPRG_211_Final_Project\\FinalProject\\WrenchHub\\Components\\Pages\\Customers.razor",
+              "RelativeToolTip": "Components\\Pages\\Customers.razor",
+              "ViewState": "AQIAAJwAAAAAAAAAAAAAAJ8AAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2024-08-10T09:33:47.464Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

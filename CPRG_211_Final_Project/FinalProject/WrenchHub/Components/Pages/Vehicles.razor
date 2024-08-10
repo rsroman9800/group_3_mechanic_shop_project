@@ -1,0 +1,261 @@
+﻿@page "/vehicles"
+@using System.Collections.Generic
+@using System.IO
+@using System.Linq
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3>Vehicle Management</h3>
+
+    
+    <div class="find-vehicle-section">
+        <h4>Find Vehicle</h4>
+        <div class="input-group">
+            <label for="vehicle-id">Vehicle ID:</label>
+            <input type="text" id="vehicle-id" @bind="searchVehicleId" placeholder="Enter Vehicle ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="make">Make:</label>
+            <select id="make" @bind="searchMake">
+                <option value="" disabled selected>Select Make</option>
+                @foreach (var make in makes)
+                {
+                    <option value="@make">@make</option>
+                }
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="model">Model:</label>
+            <input type="text" id="model" @bind="searchModel" placeholder="Enter Model">
+        </div>
+        <div class="input-group">
+            <label for="year">Year:</label>
+            <select id="year" @bind="searchYear">
+                <option value="" disabled selected>Select Year</option>
+                @foreach (var year in years)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="vin">VIN:</label>
+            <input type="text" id="vin" @bind="searchVin" placeholder="Enter VIN">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="FindVehicle">Find Vehicle</button>
+        </div>
+
+        <div class="vehicle-results">
+            @if (!string.IsNullOrEmpty(vehicleErrorMessage))
+            {
+                <p class="error-message">@vehicleErrorMessage</p>
+            }
+            else if (foundVehicle != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer ID</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th>Year</th>
+                            <th>VIN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@foundVehicle.Id</td>
+                            <td>@foundVehicle.CustomerId</td>
+                            <td>@foundVehicle.Make</td>
+                            <td>@foundVehicle.Model</td>
+                            <td>@foundVehicle.Year</td>
+                            <td>@foundVehicle.Vin</td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+   
+    <div class="add-vehicle-section">
+        <h4>Add New Vehicle</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-vehicle-id">Vehicle ID:</label>
+                <input type="text" id="new-vehicle-id" @bind="newVehicleId" placeholder="Enter Vehicle ID">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-make">Make:</label>
+                <select id="new-make" @bind="newMake">
+                    <option value="" disabled selected>Select Make</option>
+                    @foreach (var make in makes)
+                    {
+                        <option value="@make">@make</option>
+                    }
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="new-model">Model:</label>
+                <input type="text" id="new-model" @bind="newModel" placeholder="Enter Model">
+            </div>
+            <div class="input-group">
+                <label for="new-year">Year:</label>
+                <select id="new-year" @bind="newYear">
+                    <option value="" disabled selected>Select Year</option>
+                    @foreach (var year in years)
+                    {
+                        <option value="@year">@year</option>
+                    }
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="new-vin">VIN:</label>
+                <input type="text" id="new-vin" @bind="newVin" placeholder="Enter VIN">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="AddVehicle">Add Vehicle</button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addVehicleSuccessMessage))
+        {
+            <div class="alert alert-success">@addVehicleSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addVehicleErrorMessage))
+        {
+            <div class="alert alert-danger">@addVehicleErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    
+    string searchVehicleId;
+    string searchCustomerId;
+    string searchMake;
+    string searchModel;
+    string searchYear;
+    string searchVin;
+    Vehicle foundVehicle;
+    string vehicleErrorMessage;
+
+    
+    string newVehicleId;
+    string newCustomerId;
+    string newMake;
+    string newModel;
+    string newYear;
+    string newVin;
+    string addVehicleSuccessMessage;
+    string addVehicleErrorMessage;
+
+    
+    List<string> makes = new List<string>();
+    List<string> years = new List<string>();
+
+ 
+    List<Vehicle> vehicles = new List<Vehicle>();
+
+    protected override void OnInitialized()
+    {
+        // Load data for dropdowns
+        makes = LoadDataFromCsv("Resources/Res/make.csv");
+        years = LoadDataFromCsv("Resources/Res/year.csv");
+
+        // Debugging: Check if data is loaded
+        if (!makes.Any()) makes.Add("Error loading makes");
+        if (!years.Any()) years.Add("Error loading years");
+    }
+
+    private List<string> LoadDataFromCsv(string relativePath)
+    {
+        var data = new List<string>();
+        try
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativePath);
+            if (File.Exists(filePath))
+            {
+                data = File.ReadAllLines(filePath).ToList();
+            }
+            else
+            {
+                data.Add("File not found: " + filePath);
+            }
+        }
+        catch (Exception ex)
+        {
+            data.Add("Error loading file: " + ex.Message);
+        }
+        return data;
+    }
+
+    private void FindVehicle()
+    {
+        try
+        {
+            vehicleErrorMessage = string.Empty;
+            foundVehicle = vehicles.FirstOrDefault(v =>
+                (string.IsNullOrEmpty(searchVehicleId) || v.Id == searchVehicleId) &&
+                (string.IsNullOrEmpty(searchCustomerId) || v.CustomerId == searchCustomerId) &&
+                (string.IsNullOrEmpty(searchMake) || v.Make == searchMake) &&
+                (string.IsNullOrEmpty(searchModel) || v.Model == searchModel) &&
+                (string.IsNullOrEmpty(searchYear) || v.Year == searchYear) &&
+                (string.IsNullOrEmpty(searchVin) || v.Vin == searchVin));
+
+            if (foundVehicle == null)
+            {
+                vehicleErrorMessage = "No vehicle found.";
+            }
+        }
+        catch (Exception e)
+        {
+            vehicleErrorMessage = $"Error finding vehicle: {e.Message}";
+        }
+    }
+
+    private void AddVehicle()
+    {
+        try
+        {
+            addVehicleSuccessMessage = string.Empty;
+            addVehicleErrorMessage = string.Empty;
+
+            var newVehicle = new Vehicle
+                {
+                    Id = newVehicleId,
+                    CustomerId = newCustomerId,
+                    Make = newMake,
+                    Model = newModel,
+                    Year = newYear,
+                    Vin = newVin
+                };
+
+            vehicles.Add(newVehicle);
+            addVehicleSuccessMessage = "Vehicle successfully added!";
+        }
+        catch (Exception e)
+        {
+            addVehicleErrorMessage = $"Error adding vehicle: {e.Message}";
+        }
+    }
+
+    
+    public class Vehicle
+    {
+        public string Id { get; set; }
+        public string CustomerId { get; set; }
+        public string Make { get; set; }
+        public string Model { get; set; }
+        public string Year { get; set; }
+        public string Vin { get; set; }
+    }
+}

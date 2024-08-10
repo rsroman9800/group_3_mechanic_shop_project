@@ -1,0 +1,130 @@
+
+body[b-472yvfb0i4] {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f7f9fc;
+    margin: 0;
+    padding: 0;
+}
+
+.container[b-472yvfb0i4] {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    animation: fadeIn-b-472yvfb0i4 1s ease-in-out;
+}
+
+h3[b-472yvfb0i4] {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    animation: slideIn-b-472yvfb0i4 1s ease-in-out;
+}
+
+h4[b-472yvfb0i4] {
+    color: #2980b9;
+    margin-bottom: 15px;
+}
+
+
+.input-group[b-472yvfb0i4] {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+}
+
+    .input-group label[b-472yvfb0i4] {
+        margin-bottom: 5px;
+        color: #34495e;
+    }
+
+    .input-group input[b-472yvfb0i4],
+    .input-group select[b-472yvfb0i4],
+    .input-group textarea[b-472yvfb0i4] {
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        border-radius: 5px;
+        transition: border-color 0.3s ease-in-out;
+    }
+
+        .input-group input:focus[b-472yvfb0i4],
+        .input-group select:focus[b-472yvfb0i4],
+        .input-group textarea:focus[b-472yvfb0i4] {
+            border-color: #2980b9;
+            outline: none;
+        }
+
+.btn[b-472yvfb0i4] {
+    padding: 10px 20px;
+    background-color: #2980b9;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+}
+
+    .btn:hover[b-472yvfb0i4] {
+        background-color: #3498db;
+    }
+
+.table[b-472yvfb0i4] {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+    .table thead[b-472yvfb0i4] {
+        background-color: #2980b9;
+        color: #fff;
+    }
+
+    .table th[b-472yvfb0i4],
+    .table td[b-472yvfb0i4] {
+        padding: 10px;
+        border: 1px solid #bdc3c7;
+        text-align: left;
+    }
+
+.error-message[b-472yvfb0i4] {
+    color: #e74c3c;
+}
+
+.alert[b-472yvfb0i4] {
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.alert-success[b-472yvfb0i4] {
+    background-color: #2ecc71;
+    color: #fff;
+}
+
+.alert-danger[b-472yvfb0i4] {
+    background-color: #e74c3c;
+    color: #fff;
+}
+
+
+@keyframes fadeIn-b-472yvfb0i4 {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn-b-472yvfb0i4 {
+    from {
+        transform: translateY(-20px);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}

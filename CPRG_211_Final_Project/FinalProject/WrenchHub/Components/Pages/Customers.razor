@@ -1,0 +1,168 @@
+﻿@page "/customers"
+@using System.Collections.Generic
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3>Customer Management</h3>
+
+    <!-- Existing Customer Section -->
+    <div class="existing-customer-section">
+        <h4>Find Existing Customer</h4>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-name">Name:</label>
+            <input type="text" id="customer-name" @bind="searchCustomerName" placeholder="Enter Name">
+        </div>
+        <div class="input-group">
+            <label for="customer-phone">Phone Number:</label>
+            <input type="text" id="customer-phone" @bind="searchCustomerPhone" placeholder="Enter Phone Number">
+        </div>
+        <div class="input-group">
+            <label for="customer-email">Email:</label>
+            <input type="text" id="customer-email" @bind="searchCustomerEmail" placeholder="Enter Email">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="FindCustomer">Find Customer</button>
+        </div>
+
+        <div class="customer-results">
+            @if (!string.IsNullOrEmpty(customerErrorMessage))
+            {
+                <p class="error-message">@customerErrorMessage</p>
+            }
+            else if (foundCustomer != null)
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>@foundCustomer.Id</td>
+                            <td>@foundCustomer.Name</td>
+                            <td>@foundCustomer.Phone</td>
+                            <td>@foundCustomer.Email</td>
+                        </tr>
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- New Customer Section -->
+    <div class="new-customer-section">
+        <h4>Add New Customer</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-name">Name:</label>
+                <input type="text" id="new-customer-name" @bind="newCustomerName" placeholder="Enter Name">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-phone">Phone Number:</label>
+                <input type="text" id="new-customer-phone" @bind="newCustomerPhone" placeholder="Enter Phone Number">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-email">Email:</label>
+                <input type="text" id="new-customer-email" @bind="newCustomerEmail" placeholder="Enter Email">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="AddCustomer">Add Customer</button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addCustomerSuccessMessage))
+        {
+            <div class="alert alert-success">@addCustomerSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addCustomerErrorMessage))
+        {
+            <div class="alert alert-danger">@addCustomerErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    // Variables for existing customer search
+    string searchCustomerId;
+    string searchCustomerName;
+    string searchCustomerPhone;
+    string searchCustomerEmail;
+    Customer foundCustomer;
+    string customerErrorMessage;
+
+    // Variables for new customer addition
+    string newCustomerId;
+    string newCustomerName;
+    string newCustomerPhone;
+    string newCustomerEmail;
+    string addCustomerSuccessMessage;
+    string addCustomerErrorMessage;
+
+    
+    List<Customer> customers = new List<Customer>();
+
+    private void FindCustomer()
+    {
+        try
+        {
+            customerErrorMessage = string.Empty;
+            foundCustomer = customers.FirstOrDefault(c =>
+                (string.IsNullOrEmpty(searchCustomerId) || c.Id == searchCustomerId) &&
+                (string.IsNullOrEmpty(searchCustomerName) || c.Name == searchCustomerName) &&
+                (string.IsNullOrEmpty(searchCustomerPhone) || c.Phone == searchCustomerPhone) &&
+                (string.IsNullOrEmpty(searchCustomerEmail) || c.Email == searchCustomerEmail));
+
+            if (foundCustomer == null)
+            {
+                customerErrorMessage = "No customer found.";
+            }
+        }
+        catch (Exception e)
+        {
+            customerErrorMessage = $"Error finding customer: {e.Message}";
+        }
+    }
+
+    private void AddCustomer()
+    {
+        try
+        {
+            addCustomerSuccessMessage = string.Empty;
+            addCustomerErrorMessage = string.Empty;
+
+            var newCustomer = new Customer
+                {
+                    Id = newCustomerId,
+                    Name = newCustomerName,
+                    Phone = newCustomerPhone,
+                    Email = newCustomerEmail
+                };
+
+            customers.Add(newCustomer);
+            addCustomerSuccessMessage = "Customer successfully added!";
+        }
+        catch (Exception e)
+        {
+            addCustomerErrorMessage = $"Error adding customer: {e.Message}";
+        }
+    }
+
+    
+    public class Customer
+    {
+        public string Id { get; set; }
+        public string Name { get; set; }
+        public string Phone { get; set; }
+        public string Email { get; set; }
+    }
+}
