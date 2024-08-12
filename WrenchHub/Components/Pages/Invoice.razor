@@ -1,0 +1,415 @@
+﻿<!--
+Name: Roman Sorokin, Mace Howald, Nasratullah AsadiTRFG/
+Date: 2024-08-11
+
+Program Description:
+This page is part of a vehicle management system built using MAUI.
+The application allows users to manage invoices by finding existing invoices based on criteria such as Invoice ID, Customer ID, Appointment ID, or Date Issued. Additionally, users can generate new invoices by providing necessary details like labor cost, parts cost, and dates issued and paid.
+
+Inputs:
+Users input search criteria in the form of text fields and date pickers. The search criteria are processed to query the database for matching records. For generating new invoices, users input invoice details including labor and parts costs, customer ID, and appointment ID.
+
+Processing:
+The page interacts with an SQL database to retrieve or insert invoice records based on user input. If search criteria are provided, the system queries the database for matching records.
+If no criteria are provided, it returns all invoices. For generating a new invoice, the system validates the input and inserts a new record into the database.
+
+Outputs:
+The outputs are displayed in a table format showing the invoice details that match the search criteria. If generating a new invoice, the system outputs a success or error message based on the operation result, and the invoice is optionally saved as a PDF.
+-->
+
+@page "/invoice"
+@using System.Collections.Generic
+@using System.IO
+@using System.Linq
+@using iText.Kernel.Pdf
+@using iText.Layout
+@using iText.Layout.Element
+@using Microsoft.Data.SqlClient
+@inject NavigationManager Navigation
+@using TravelApp.Data
+
+<div class="container">
+    <h3>Invoice Management</h3>
+
+    <!-- Find Invoice Section -->
+    <div class="find-invoice-section">
+        <h4>Find Invoice</h4>
+        <div class="input-group">
+            <label for="invoice-id">Invoice ID:</label>
+            <input type="text" id="invoice-id" @bind="searchInvoiceId" placeholder="Enter Invoice ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="appointment-id">Appointment ID:</label>
+            <input type="text" id="appointment-id" @bind="searchAppointmentId" placeholder="Enter Appointment ID">
+        </div>
+        <div class="input-group">
+            <label for="date-issued">Date Issued:</label>
+            <input type="date" id="date-issued" @bind="searchDateIssued">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="async () => await FindInvoice()">Find Invoice</button>
+        </div>
+
+        <div class="invoice-results">
+            @if (!string.IsNullOrEmpty(invoiceErrorMessage))
+            {
+                <p class="error-message">@invoiceErrorMessage</p>
+            }
+            else if (invoices.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Invoice ID</th>
+                            <th>Customer ID</th>
+                            <th>Appointment ID</th>
+                            <th>Labor Cost</th>
+                            <th>Parts Cost</th>
+                            <th>Total Cost</th>
+                            <th>Date Issued</th>
+                            <th>Date Paid</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var invoice in invoices)
+                        {
+                            <tr>
+                                <td>@invoice.InvoiceId</td>
+                                <td>@invoice.CustomerId</td>
+                                <td>@invoice.AppointmentId</td>
+                                <td>@invoice.LaborCost</td>
+                                <td>@invoice.PartsCost</td>
+                                <td>@invoice.TotalCost</td>
+                                <td>@invoice.DateIssued.ToShortDateString()</td>
+                                <td>@invoice.DatePaid?.ToShortDateString()</td>
+                                <td>
+                                    <button class="btn btn-secondary" @onclick="() => EditInvoice(invoice.InvoiceId)">Edit</button>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Add/Edit Invoice Section -->
+    <div class="add-invoice-section">
+        <h4>@(isEditing ? "Edit Invoice" : "Generate New Invoice")</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-invoice-id">Invoice ID:</label>
+                <input type="text" id="new-invoice-id" @bind="newInvoiceId" placeholder="Enter Invoice ID" disabled="@isEditing">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-appointment-id">Appointment ID:</label>
+                <input type="text" id="new-appointment-id" @bind="newAppointmentId" placeholder="Enter Appointment ID">
+            </div>
+            <div class="input-group">
+                <label for="new-labor-cost">Labor Cost:</label>
+                <input type="text" id="new-labor-cost" @bind="newLaborCost" placeholder="Enter Labor Cost ($)">
+            </div>
+            <div class="input-group">
+                <label for="new-parts-cost">Parts Cost:</label>
+                <input type="text" id="new-parts-cost" @bind="newPartsCost" placeholder="Enter Parts Cost ($)">
+            </div>
+            <div class="input-group">
+                <label for="new-total-cost">Total Cost:</label>
+                <input type="text" id="new-total-cost" @bind="newTotalCost" placeholder="Enter Total Cost ($)" disabled>
+            </div>
+            <div class="input-group">
+                <label for="new-date-issued">Date Issued:</label>
+                <input type="date" id="new-date-issued" @bind="newDateIssued">
+            </div>
+            <div class="input-group">
+                <label for="new-date-paid">Date Paid:</label>
+                <input type="date" id="new-date-paid" @bind="newDatePaid">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="@(isEditing ? async () => await UpdateInvoice() : async () => await GenerateInvoice())">
+                @(isEditing ? "Update Invoice" : "Generate Invoice")
+            </button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addInvoiceSuccessMessage))
+        {
+            <div class="alert alert-success">@addInvoiceSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addInvoiceErrorMessage))
+        {
+            <div class="alert alert-danger">@addInvoiceErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    // Variables for finding invoices
+    string searchInvoiceId;
+    string searchCustomerId;
+    string searchAppointmentId;
+    DateTime? searchDateIssued;
+    InvoiceModel foundInvoice;
+    string invoiceErrorMessage;
+
+    // Variables for generating invoices
+    string newInvoiceId;
+    string newCustomerId;
+    string newAppointmentId;
+    string newLaborCost;
+    string newPartsCost;
+    string newTotalCost;
+    DateTime? newDateIssued;
+    DateTime? newDatePaid;
+    string addInvoiceSuccessMessage;
+    string addInvoiceErrorMessage;
+    bool isEditing;
+
+    List<InvoiceModel> invoices = new List<InvoiceModel>();
+
+    private async Task FindInvoice()
+    {
+        try
+        {
+            invoiceErrorMessage = string.Empty; // Clear error message
+            invoices.Clear(); // Clear previous results
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create connection
+            await connect.OpenAsync(); // Open connection
+
+            SqlCommand command = new SqlCommand(
+                "SELECT * FROM invoice_table WHERE " +
+                "(@InvoiceId IS NULL OR invoice_id = @InvoiceId) " +
+                "AND (@CustomerId IS NULL OR customer_id = @CustomerId) " +
+                "AND (@AppointmentId IS NULL OR appointment_id = @AppointmentId) " +
+                "AND (@DateIssued IS NULL OR date_issued = @DateIssued)", connect); // SQL command to find invoice
+
+            command.Parameters.AddWithValue("@InvoiceId", string.IsNullOrEmpty(searchInvoiceId) ? (object)DBNull.Value : int.Parse(searchInvoiceId)); // Add Invoice ID parameter
+            command.Parameters.AddWithValue("@CustomerId", string.IsNullOrEmpty(searchCustomerId) ? (object)DBNull.Value : int.Parse(searchCustomerId)); // Add Customer ID parameter
+            command.Parameters.AddWithValue("@AppointmentId", string.IsNullOrEmpty(searchAppointmentId) ? (object)DBNull.Value : int.Parse(searchAppointmentId)); // Add Appointment ID parameter
+            command.Parameters.AddWithValue("@DateIssued", searchDateIssued.HasValue ? searchDateIssued.Value.Date : (object)DBNull.Value); // Add Date Issued parameter
+
+            SqlDataReader reader = await command.ExecuteReaderAsync(); // Execute the command
+
+            while (await reader.ReadAsync()) // Read each row
+            {
+                invoices.Add(new InvoiceModel
+                    {
+                        InvoiceId = reader.GetInt32(0),
+                        CustomerId = reader.GetInt32(1),
+                        AppointmentId = reader.GetInt32(2),
+                        LaborCost = reader.GetDouble(3),
+                        PartsCost = reader.GetDouble(4),
+                        TotalCost = reader.GetDouble(5),
+                        DateIssued = reader.GetDateTime(6),
+                        DatePaid = reader.IsDBNull(7) ? (DateTime?)null : reader.GetDateTime(7)
+                    });
+            }
+
+            if (!invoices.Any()) // If no invoices are found
+            {
+                invoiceErrorMessage = "No invoice found."; // Set error message
+            }
+
+            reader.Close(); // Close the reader
+        }
+        catch (Exception e) // Catch any exceptions
+        {
+            invoiceErrorMessage = $"Error finding invoice: {e.Message}"; // Set error message
+        }
+    }
+
+    private async Task GenerateInvoice()
+    {
+        try
+        {
+            addInvoiceSuccessMessage = string.Empty; // Clear success message
+            addInvoiceErrorMessage = string.Empty; // Clear error message
+
+            int customerId = int.Parse(newCustomerId); // Parse Customer ID
+            int appointmentId = int.Parse(newAppointmentId); // Parse Appointment ID
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create connection
+            await connect.OpenAsync(); // Open connection
+
+            // Validate if Customer ID exists
+            SqlCommand customerCheckCommand = new SqlCommand("SELECT COUNT(*) FROM customer_table WHERE customer_id = @CustomerId", connect); // SQL command to check if Customer ID exists
+            customerCheckCommand.Parameters.AddWithValue("@CustomerId", customerId); // Add Customer ID parameter
+            int customerExists = (int)await customerCheckCommand.ExecuteScalarAsync(); // Execute the command
+
+            if (customerExists == 0) // If Customer ID does not exist
+            {
+                addInvoiceErrorMessage = "Customer ID does not exist."; // Set error message
+                return;
+            }
+
+            // Validate if Appointment ID exists
+            SqlCommand appointmentCheckCommand = new SqlCommand("SELECT COUNT(*) FROM appointment_table WHERE appointment_id = @AppointmentId", connect); // SQL command to check if Appointment ID exists
+            appointmentCheckCommand.Parameters.AddWithValue("@AppointmentId", appointmentId); // Add Appointment ID parameter
+            int appointmentExists = (int)await appointmentCheckCommand.ExecuteScalarAsync(); // Execute the command
+
+            if (appointmentExists == 0)
+            {
+                addInvoiceErrorMessage = "Appointment ID does not exist."; // Set error message
+                return;
+            }
+
+            // Parse costs
+            double laborCost = double.Parse(newLaborCost); // Parse Labor Cost
+            double partsCost = double.Parse(newPartsCost); // Parse Parts Cost
+            double totalCost = laborCost + partsCost; // Calculate Total Cost
+
+            // Insert the new invoice
+            SqlCommand command = new SqlCommand(
+                "INSERT INTO invoice_table (invoice_id, customer_id, appointment_id, labor_cost, parts_cost, total_cost, date_issued, date_paid) " +
+                "VALUES (@InvoiceId, @CustomerId, @AppointmentId, @LaborCost, @PartsCost, @TotalCost, @DateIssued, @DatePaid)", connect); // SQL command to insert new invoice
+
+            command.Parameters.AddWithValue("@InvoiceId", int.Parse(newInvoiceId)); // Add Invoice ID parameter
+            command.Parameters.AddWithValue("@CustomerId", customerId); // Add Customer ID parameter
+            command.Parameters.AddWithValue("@AppointmentId", appointmentId); // Add Appointment ID parameter
+            command.Parameters.AddWithValue("@LaborCost", laborCost); // Add Labor Cost parameter
+            command.Parameters.AddWithValue("@PartsCost", partsCost); // Add Parts Cost parameter
+            command.Parameters.AddWithValue("@TotalCost", totalCost); // Add Total Cost parameter
+            command.Parameters.AddWithValue("@DateIssued", newDateIssued ?? DateTime.Now); // Add Date Issued parameter using the nullable operator
+            command.Parameters.AddWithValue("@DatePaid", newDatePaid.HasValue ? newDatePaid.Value.Date : (object)DBNull.Value); // Add Date Paid parameter
+
+            int result = await command.ExecuteNonQueryAsync();
+
+            if (result > 0)
+            {
+                addInvoiceSuccessMessage = "Invoice successfully generated!"; // Set success message
+            }
+            else
+            {
+                addInvoiceErrorMessage = "Error generating invoice."; // Set error message
+            }
+        }
+        catch (Exception e)
+        {
+            addInvoiceErrorMessage = $"Error generating invoice: {e.Message}"; // Set error message
+        }
+    }
+
+    private async Task UpdateInvoice()
+    {
+        try
+        {
+            addInvoiceSuccessMessage = string.Empty; // Clear success message
+            addInvoiceErrorMessage = string.Empty; // Clear error message
+
+            int customerId = int.Parse(newCustomerId); // Parse Customer ID
+            int appointmentId = int.Parse(newAppointmentId); // Parse Appointment ID
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create connection
+            await connect.OpenAsync(); // Open connection
+
+            // Validate if Customer ID exists
+            SqlCommand customerCheckCommand = new SqlCommand("SELECT COUNT(*) FROM customer_table WHERE customer_id = @CustomerId", connect); // SQL command to check if Customer ID exists
+            customerCheckCommand.Parameters.AddWithValue("@CustomerId", customerId); // Add Customer ID parameter
+            int customerExists = (int)await customerCheckCommand.ExecuteScalarAsync(); // Execute the command
+
+            if (customerExists == 0)
+            {
+                addInvoiceErrorMessage = "Customer ID does not exist."; // Set error message
+                return;
+            }
+
+            // Validate if Appointment ID exists
+            SqlCommand appointmentCheckCommand = new SqlCommand("SELECT COUNT(*) FROM appointment_table WHERE appointment_id = @AppointmentId", connect); // SQL command to check if Appointment ID exists
+            appointmentCheckCommand.Parameters.AddWithValue("@AppointmentId", appointmentId); // Add Appointment ID parameter
+            int appointmentExists = (int)await appointmentCheckCommand.ExecuteScalarAsync(); // Execute the command
+
+            if (appointmentExists == 0)
+            {
+                addInvoiceErrorMessage = "Appointment ID does not exist."; // Set error message
+                return;
+            }
+
+            // Parse costs
+            double laborCost = double.Parse(newLaborCost); // Parse Labor Cost
+            double partsCost = double.Parse(newPartsCost); // Parse Parts Cost
+            double totalCost = laborCost + partsCost; // Calculate Total Cost
+
+            // Update the invoice
+            SqlCommand command = new SqlCommand(
+                "UPDATE invoice_table SET customer_id = @CustomerId, appointment_id = @AppointmentId, labor_cost = @LaborCost, parts_cost = @PartsCost, total_cost = @TotalCost, date_issued = @DateIssued, date_paid = @DatePaid " +
+                "WHERE invoice_id = @InvoiceId", connect); // SQL command to update invoice
+
+            command.Parameters.AddWithValue("@InvoiceId", int.Parse(newInvoiceId)); // Add Invoice ID parameter
+            command.Parameters.AddWithValue("@CustomerId", customerId); // Add Customer ID parameter
+            command.Parameters.AddWithValue("@AppointmentId", appointmentId); // Add Appointment ID parameter
+            command.Parameters.AddWithValue("@LaborCost", laborCost); // Add Labor Cost parameter
+            command.Parameters.AddWithValue("@PartsCost", partsCost); // Add Parts Cost parameter
+            command.Parameters.AddWithValue("@TotalCost", totalCost); // Add Total Cost parameter
+            command.Parameters.AddWithValue("@DateIssued", newDateIssued ?? DateTime.Now); // Add Date Issued parameter
+            command.Parameters.AddWithValue("@DatePaid", newDatePaid.HasValue ? newDatePaid.Value.Date : (object)DBNull.Value); // Add Date Paid parameter
+
+            int result = await command.ExecuteNonQueryAsync(); // Execute the command
+
+            if (result > 0)
+            {
+                addInvoiceSuccessMessage = "Invoice successfully updated!"; // Set success message
+            }
+            else
+            {
+                addInvoiceErrorMessage = "Error updating invoice."; // Set error message
+            }
+        }
+        catch (Exception e)
+        {
+            addInvoiceErrorMessage = $"Error updating invoice: {e.Message}"; // Set error message
+        }
+    }
+
+    private void EditInvoice(int invoiceId)
+    {
+        // Ensure that invoices list is not null and contains data
+        if (invoices == null || !invoices.Any())
+        {
+            invoiceErrorMessage = "No invoices available to edit.";
+            return;
+        }
+
+        // Try to find the invoice by ID
+        var invoiceToEdit = invoices.FirstOrDefault(inv => inv.InvoiceId == invoiceId);
+
+        // Check if the invoice is found
+        if (invoiceToEdit != null)
+        {
+            isEditing = true;
+            foundInvoice = invoiceToEdit; // Set the invoice to edit
+
+            // Check if foundInvoice is null before assigning values
+            if (foundInvoice != null)
+            {
+                newInvoiceId = foundInvoice.InvoiceId.ToString();
+                newCustomerId = foundInvoice.CustomerId.ToString();
+                newAppointmentId = foundInvoice.AppointmentId.ToString();
+                newLaborCost = foundInvoice.LaborCost.ToString();
+                newPartsCost = foundInvoice.PartsCost.ToString();
+                newTotalCost = foundInvoice.TotalCost.ToString();
+                newDateIssued = foundInvoice.DateIssued;
+                newDatePaid = foundInvoice.DatePaid;
+            }
+            else
+            {
+                invoiceErrorMessage = "Selected invoice could not be found.";
+            }
+        }
+        else
+        {
+            // Handle case where the invoice is not found
+            invoiceErrorMessage = "Invoice not found.";
+        }
+    }
+}

@@ -1,0 +1,261 @@
+﻿<!--
+Name: Roman Sorokin, Mace Howald, Nasratullah Asadi
+Date: 2024-08-11
+
+Program Description:
+This page is part of a vehicle management system built using MAUI.
+The application allows users to manage customer records by finding existing customers based on criteria such as Customer ID, Name, Phone Number, or Email. Additionally, users can add new customers by providing necessary details like name, phone number, and email.
+
+Inputs:
+Users input search criteria in the form of text fields. The search criteria are processed to query the database for matching records. For adding new customers, users input customer details including name, phone number, and email.
+
+Processing:
+The page interacts with an SQL database to retrieve or insert customer records based on user input. If search criteria are provided, the system queries the database for matching records.
+If no criteria are provided, it returns all customers. For adding a new customer, the system validates the input and inserts a new record into the database.
+
+Outputs:
+The outputs are displayed in a table format showing the customer details that match the search criteria. If adding a new customer, the system outputs a success or error message based on the operation result.
+-->
+
+@page "/customers"
+@using System.Collections.Generic
+@using TravelApp.Data
+@using Microsoft.Data.SqlClient
+@inject NavigationManager Navigation
+
+<div class="container">
+    <h3>Customer Management</h3>
+
+    <!-- Existing Customer Section -->
+    <div class="existing-customer-section">
+        <h4>Find Existing Customer</h4>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-name">Name:</label>
+            <input type="text" id="customer-name" @bind="searchCustomerName" placeholder="Enter Name">
+        </div>
+        <div class="input-group">
+            <label for="customer-phone">Phone Number:</label>
+            <input type="text" id="customer-phone" @bind="searchCustomerPhone" placeholder="Enter Phone Number">
+        </div>
+        <div class="input-group">
+            <label for="customer-email">Email:</label>
+            <input type="text" id="customer-email" @bind="searchCustomerEmail" placeholder="Enter Email">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="async () => await FindCustomer()">Find Customer</button>
+        </div>
+
+        <div class="customer-results">
+            @if (!string.IsNullOrEmpty(customerErrorMessage))
+            {
+                <p class="error-message">@customerErrorMessage</p>
+            }
+            else if (foundCustomer != null && foundCustomer.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var customer in foundCustomer)
+                        {
+                        <tr>
+                            <td>@customer.Id</td>
+                            <td>@customer.Name</td>
+                            <td>@customer.Phone</td>
+                            <td>@customer.Email</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- New Customer Section -->
+    <div class="new-customer-section">
+        <h4>Add New Customer</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-name">Name:</label>
+                <input type="text" id="new-customer-name" @bind="newCustomerName" placeholder="Enter Name">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-phone">Phone Number:</label>
+                <input type="text" id="new-customer-phone" @bind="newCustomerPhone" placeholder="Enter Phone Number">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-email">Email:</label>
+                <input type="text" id="new-customer-email" @bind="newCustomerEmail" placeholder="Enter Email">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="async () => await AddCustomer()">Add Customer</button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addCustomerSuccessMessage))
+        {
+            <div class="alert alert-success">@addCustomerSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addCustomerErrorMessage))
+        {
+            <div class="alert alert-danger">@addCustomerErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    // Variables for existing customer search
+    string searchCustomerId;
+    string searchCustomerName;
+    string searchCustomerPhone;
+    string searchCustomerEmail;
+    private List<Customer> foundCustomer = new List<Customer>();
+    string customerErrorMessage;
+
+    // Variables for new customer addition
+    string newCustomerId;
+    string newCustomerName;
+    string newCustomerPhone;
+    string newCustomerEmail;
+    string addCustomerSuccessMessage;
+    string addCustomerErrorMessage;
+
+    List<Customer> customers = new List<Customer>(); // Creates a list of customers
+
+    private async Task FindCustomer()
+    {
+        try
+        {
+            customerErrorMessage = string.Empty; // Clear any previous error messages
+            foundCustomer.Clear(); // Clear any previous search results
+
+            // Validate phone number
+            long customerPhoneParsed = 0; // Initialize customerPhoneParsed to 0
+            if (!string.IsNullOrEmpty(searchCustomerPhone)) // If searchCustomerPhone is not empty
+            {
+                try
+                {
+                    customerPhoneParsed = long.Parse(searchCustomerPhone); // Parse searchCustomerPhone to long
+                }
+                catch (FormatException)
+                {
+                    customerErrorMessage = "Please enter a phone number using only numbers."; // Display error message
+                    return;
+                }
+            }
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create a new SqlConnection object
+            await connect.OpenAsync(); // Open the connection
+
+            SqlCommand command = new SqlCommand(
+                "SELECT * FROM customer_table WHERE " +
+                "(@CustomerId IS NULL OR customer_id = @CustomerId) " +
+                "AND (@CustomerName IS NULL OR customer_name LIKE @CustomerName) " +
+                "AND (@CustomerPhone IS NULL OR customer_phone = @CustomerPhone) " +
+                "AND (@CustomerEmail IS NULL OR customer_email = @CustomerEmail)", connect); // SQL command to find customer
+
+            // Adjust parameters to be DBNull when empty
+            command.Parameters.AddWithValue("@CustomerId", string.IsNullOrEmpty(searchCustomerId) ? (object)DBNull.Value : int.Parse(searchCustomerId)); // Add parameter for Customer ID
+            command.Parameters.AddWithValue("@CustomerName", string.IsNullOrEmpty(searchCustomerName) ? (object)DBNull.Value : $"%{searchCustomerName}%"); // Add parameter for Customer Name
+            command.Parameters.AddWithValue("@CustomerPhone", string.IsNullOrEmpty(searchCustomerPhone) ? (object)DBNull.Value : customerPhoneParsed); // Add parameter for Customer Phone
+            command.Parameters.AddWithValue("@CustomerEmail", string.IsNullOrEmpty(searchCustomerEmail) ? (object)DBNull.Value : searchCustomerEmail); // Add parameter for Customer Email
+
+            SqlDataReader reader = await command.ExecuteReaderAsync(); // Execute the command and create a SqlDataReader object
+
+            while (await reader.ReadAsync()) // If a customer is found
+            {
+                foundCustomer.Add(new Customer // Create a new Customer object and add it to the list
+                    {
+                        Id = reader.GetInt32(0),
+                        Name = reader.GetString(1).Trim(),
+                        Phone = reader.GetInt64(2),
+                        Email = reader.GetString(3).Trim()
+                    });
+            }
+
+            if (!foundCustomer.Any()) // If no customers are found
+            {
+                customerErrorMessage = "No customer found."; // Display error message
+            }
+
+            reader.Close();
+        }
+        catch (Exception e)
+        {
+            customerErrorMessage = $"Error finding customer: {e.Message}"; // Display error message
+        }
+    }
+
+    private async Task AddCustomer()
+    {
+        try
+        {
+            addCustomerSuccessMessage = string.Empty; // Clear any previous success messages
+            addCustomerErrorMessage = string.Empty; // Clear any previous error messages
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create a new SqlConnection object
+            await connect.OpenAsync(); // Open the connection
+
+            // Check if Customer ID already exists
+            SqlCommand checkCustomerCommand = new SqlCommand(
+                "SELECT COUNT(*) FROM customer_table WHERE customer_id = @CustomerId", connect); // SQL command to check if customer exists
+            checkCustomerCommand.Parameters.AddWithValue("@CustomerId", int.Parse(newCustomerId)); // Add parameter for Customer ID
+
+            int customerExists = (int)await checkCustomerCommand.ExecuteScalarAsync(); // Execute the command and store the result
+
+            if (customerExists > 0) // If customer exists
+            {
+                addCustomerErrorMessage = "Customer ID already exists."; // Display error message
+                return;
+            }
+
+            // Validate phone number
+            long customerPhoneParsed;
+            if (!long.TryParse(newCustomerPhone, out customerPhoneParsed))
+            {
+                addCustomerErrorMessage = "Please enter a valid phone number."; // Display error message
+                return;
+            }
+
+            // If check passed, proceed to add the customer
+            SqlCommand command = new SqlCommand(
+                "INSERT INTO customer_table (customer_id, customer_name, customer_phone, customer_email) " +
+                "VALUES (@CustomerId, @CustomerName, @CustomerPhone, @CustomerEmail)", connect); // SQL command to add customer
+
+            command.Parameters.AddWithValue("@CustomerId", int.Parse(newCustomerId)); // Add parameter for Customer ID
+            command.Parameters.AddWithValue("@CustomerName", newCustomerName); // Add parameter for Customer Name
+            command.Parameters.AddWithValue("@CustomerPhone", customerPhoneParsed); // Add parameter for Customer Phone
+            command.Parameters.AddWithValue("@CustomerEmail", newCustomerEmail); // Add parameter for Customer Email
+
+            int result = await command.ExecuteNonQueryAsync(); // Execute the command and store the result
+
+            if (result > 0)
+            {
+                addCustomerSuccessMessage = "Customer successfully added!"; // Display success message
+            }
+            else
+            {
+                addCustomerErrorMessage = "Error adding customer."; // Display error message
+            }
+        }
+        catch (Exception e)
+        {
+            addCustomerErrorMessage = $"Error adding customer: {e.Message}"; // Display error message
+        }
+    }
+
+}

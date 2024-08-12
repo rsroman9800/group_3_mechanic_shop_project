@@ -1,0 +1,328 @@
+﻿<!--
+Name: Roman Sorokin, Mace Howald, Nasratullah Asadi
+Date: 2024-08-11
+
+Program Description:
+This page is part of a vehicle management system built using MAUI.
+The application allows users to find existing vehicles by entering various search criteria
+such as Vehicle ID, Customer ID, Make, Model, Year, or VIN. Additionally, users can add new vehicles to the database by providing the necessary information.
+
+Inputs:
+Users input search criteria in the form of text fields or select options. The search criteria are then processed to query the database for matching records.
+
+Processing:
+The page interacts with an SQL database to retrieve or insert vehicle records based on the user input. If search criteria are provided, the system queries the database with those filters.
+If no criteria are provided, it returns all vehicles. For adding a new vehicle, the system validates the input and inserts a new record into the database.
+
+Outputs:
+The outputs are displayed in a table format showing the vehicle details that match the search criteria. If adding a new vehicle, the system outputs a success or error message based on the operation result.
+-->
+
+@page "/vehicles"
+@using System.Collections.Generic
+@using System.IO
+@using System.Linq
+@inject NavigationManager Navigation
+@using TravelApp.Data
+@using Microsoft.Data.SqlClient
+
+<div class="container">
+    <h3>Vehicle Management</h3>
+
+    <!-- Find Vehicle Section -->
+    <div class="find-vehicle-section">
+        <h4>Find Vehicle</h4>
+        <div class="input-group">
+            <label for="vehicle-id">Vehicle ID:</label>
+            <input type="text" id="vehicle-id" @bind="searchVehicleId" placeholder="Enter Vehicle ID">
+        </div>
+        <div class="input-group">
+            <label for="customer-id">Customer ID:</label>
+            <input type="text" id="customer-id" @bind="searchCustomerId" placeholder="Enter Customer ID">
+        </div>
+        <div class="input-group">
+            <label for="make">Make:</label>
+            <select id="make" @bind="searchMake">
+                <option value="" disabled selected>Select Make</option>
+                @foreach (var make in makes)
+                {
+                    <option value="@make">@make</option>
+                }
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="model">Model:</label>
+            <input type="text" id="model" @bind="searchModel" placeholder="Enter Model">
+        </div>
+        <div class="input-group">
+            <label for="year">Year:</label>
+            <select id="year" @bind="searchYear">
+                <option value="" disabled selected>Select Year</option>
+                @foreach (var year in years)
+                {
+                    <option value="@year">@year</option>
+                }
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="vin">VIN:</label>
+            <input type="text" id="vin" @bind="searchVin" placeholder="Enter VIN">
+        </div>
+        <div class="input-group">
+            <button type="button" class="btn btn-primary" @onclick="async () => await FindVehicle()">Find Vehicle</button>
+        </div>
+
+        <div class="vehicle-results">
+            @if (!string.IsNullOrEmpty(vehicleErrorMessage))
+            {
+                <p class="error-message">@vehicleErrorMessage</p>
+            }
+            else if (vehicles != null && vehicles.Any())
+            {
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Customer ID</th>
+                            <th>Make</th>
+                            <th>Model</th>
+                            <th>Year</th>
+                            <th>VIN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var vehicle in vehicles)
+                        {
+                            <tr>
+                                <td>@vehicle.Id</td>
+                                <td>@vehicle.CustomerId</td>
+                                <td>@vehicle.Make</td>
+                                <td>@vehicle.Model</td>
+                                <td>@vehicle.Year</td>
+                                <td>@vehicle.Vin</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+        </div>
+    </div>
+
+    <!-- Add Vehicle Section -->
+    <div class="add-vehicle-section">
+        <h4>Add New Vehicle</h4>
+        <form>
+            <div class="input-group">
+                <label for="new-vehicle-id">Vehicle ID:</label>
+                <input type="text" id="new-vehicle-id" @bind="newVehicleId" placeholder="Enter Vehicle ID">
+            </div>
+            <div class="input-group">
+                <label for="new-customer-id">Customer ID:</label>
+                <input type="text" id="new-customer-id" @bind="newCustomerId" placeholder="Enter Customer ID">
+            </div>
+            <div class="input-group">
+                <label for="new-make">Make:</label>
+                <select id="new-make" @bind="newMake">
+                    <option value="" disabled selected>Select Make</option>
+                    @foreach (var make in makes)
+                    {
+                        <option value="@make">@make</option>
+                    }
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="new-model">Model:</label>
+                <input type="text" id="new-model" @bind="newModel" placeholder="Enter Model">
+            </div>
+            <div class="input-group">
+                <label for="new-year">Year:</label>
+                <select id="new-year" @bind="newYear">
+                    <option value="" disabled selected>Select Year</option>
+                    @foreach (var year in years)
+                    {
+                        <option value="@year">@year</option>
+                    }
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="new-vin">VIN:</label>
+                <input type="text" id="new-vin" @bind="newVin" placeholder="Enter VIN">
+            </div>
+            <button class="btn btn-primary" type="button" @onclick="async () => await AddVehicle()">Add Vehicle</button>
+        </form>
+
+        @if (!string.IsNullOrEmpty(addVehicleSuccessMessage))
+        {
+            <div class="alert alert-success">@addVehicleSuccessMessage</div>
+        }
+        @if (!string.IsNullOrEmpty(addVehicleErrorMessage))
+        {
+            <div class="alert alert-danger">@addVehicleErrorMessage</div>
+        }
+    </div>
+</div>
+
+@code {
+    string searchVehicleId;
+    string searchCustomerId;
+    string searchMake;
+    string searchModel;
+    string searchYear;
+    string searchVin;
+    List<Vehicle> vehicles = new List<Vehicle>();
+    string vehicleErrorMessage;
+
+    string newVehicleId;
+    string newCustomerId;
+    string newMake;
+    string newModel;
+    string newYear;
+    string newVin;
+    string addVehicleSuccessMessage;
+    string addVehicleErrorMessage;
+
+    List<string> makes = new List<string>(); // Dropdown data
+    List<string> years = new List<string>(); // Dropdown data
+
+    protected override void OnInitialized()
+    {
+        // Load data for dropdowns
+        makes = LoadDataFromCsv("Resources/Res/make.csv"); // Resources/Res/make.csv
+        years = LoadDataFromCsv("Resources/Res/year.csv"); // Resources/Res/year.csv
+
+        // Debugging: Check if data is loaded
+        if (!makes.Any()) makes.Add("Error loading makes"); // Error message if no data
+        if (!years.Any()) years.Add("Error loading years"); // Error message if no data
+    }
+
+    private List<string> LoadDataFromCsv(string relativePath)
+    {
+        var data = new List<string>(); // Data to return
+        try
+        {
+            string filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, relativePath); // Full path
+            if (File.Exists(filePath))
+            {
+                data = File.ReadAllLines(filePath).ToList(); // Read all lines
+            }
+            else
+            {
+                data.Add("File not found: " + filePath); // Error message
+            }
+        }
+        catch (Exception ex)
+        {
+            data.Add("Error loading file: " + ex.Message); // Error message
+        }
+        return data;
+    }
+
+    private async Task FindVehicle()
+    {
+        try
+        {
+            vehicleErrorMessage = string.Empty; // Clear error message
+            vehicles.Clear(); // Clear previous searches
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create connection
+            await connect.OpenAsync(); // Open connection
+
+            SqlCommand command = new SqlCommand(
+                "SELECT * FROM vehicle_table WHERE " +
+                "(@VehicleId IS NULL OR vehicle_id = @VehicleId) " +
+                "AND (@CustomerId IS NULL OR customer_id = @CustomerId) " +
+                "AND (@Make IS NULL OR make = @Make) " +
+                "AND (@Model IS NULL OR model = @Model) " +
+                "AND (@Year IS NULL OR year = @Year) " +
+                "AND (@Vin IS NULL OR vin = @Vin)", connect); // SQL command to find vehicles
+
+            command.Parameters.AddWithValue("@VehicleId", string.IsNullOrEmpty(searchVehicleId) ? (object)DBNull.Value : int.Parse(searchVehicleId));
+            command.Parameters.AddWithValue("@CustomerId", string.IsNullOrEmpty(searchCustomerId) ? (object)DBNull.Value : int.Parse(searchCustomerId));
+            command.Parameters.AddWithValue("@Make", string.IsNullOrEmpty(searchMake) ? (object)DBNull.Value : searchMake);
+            command.Parameters.AddWithValue("@Model", string.IsNullOrEmpty(searchModel) ? (object)DBNull.Value : searchModel);
+            command.Parameters.AddWithValue("@Year", string.IsNullOrEmpty(searchYear) ? (object)DBNull.Value : searchYear);
+            command.Parameters.AddWithValue("@Vin", string.IsNullOrEmpty(searchVin) ? (object)DBNull.Value : searchVin);
+
+            SqlDataReader reader = await command.ExecuteReaderAsync(); // Execute command
+
+            while (await reader.ReadAsync()) // Read results
+            {
+                vehicles.Add(new Vehicle
+                    {
+                        Id = reader.GetInt32(0),
+                        CustomerId = reader.GetInt32(1),
+                        Make = reader.GetString(2).Trim(),
+                        Model = reader.GetString(3).Trim(),
+                        Year = reader.GetString(4).Trim(),
+                        Vin = reader.GetString(5).Trim()
+                    });
+            }
+
+            if (!vehicles.Any()) // If no vehicles are found
+            {
+                vehicleErrorMessage = "No vehicle found."; // Error message
+            }
+
+            reader.Close(); // Close reader
+        }
+        catch (Exception e)
+        {
+            vehicleErrorMessage = $"Error finding vehicle: {e.Message}"; // Error message
+        }
+    }
+
+    private async Task AddVehicle()
+    {
+        try
+        {
+            addVehicleSuccessMessage = string.Empty; // Clear success message
+            addVehicleErrorMessage = string.Empty; // Clear error message
+
+            int vehicleId = int.Parse(newVehicleId); // Parse vehicle ID
+            int customerId = int.Parse(newCustomerId); // Parse customer ID
+
+            string connectString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=mechanic_db;Integrated Security=True;Encrypt=True;"; // Connection string
+            using SqlConnection connect = new SqlConnection(connectString); // Create connection
+            await connect.OpenAsync(); // Open connection
+
+            // Validate if Customer ID exists
+            SqlCommand customerCheckCommand = new SqlCommand("SELECT COUNT(*) FROM customer_table WHERE customer_id = @CustomerId", connect); // SQL command to check if customer exists
+            customerCheckCommand.Parameters.AddWithValue("@CustomerId", customerId); // Add parameter
+            int customerExists = (int)await customerCheckCommand.ExecuteScalarAsync(); // Execute command
+
+            if (customerExists == 0) // If customer does not exist
+            {
+                addVehicleErrorMessage = "Customer ID does not exist."; // Error message
+                return;
+            }
+
+            // Insert the new vehicle
+            SqlCommand command = new SqlCommand(
+                "INSERT INTO vehicle_table (vehicle_id, customer_id, make, model, year, vin) " +
+                "VALUES (@VehicleId, @CustomerId, @Make, @Model, @Year, @Vin)", connect); // SQL command to add vehicle
+
+            command.Parameters.AddWithValue("@VehicleId", vehicleId); // Add parameters
+            command.Parameters.AddWithValue("@CustomerId", customerId);
+            command.Parameters.AddWithValue("@Make", newMake);
+            command.Parameters.AddWithValue("@Model", newModel);
+            command.Parameters.AddWithValue("@Year", newYear);
+            command.Parameters.AddWithValue("@Vin", newVin);
+
+            int result = await command.ExecuteNonQueryAsync(); // Execute command
+             
+            if (result > 0)
+            {
+                addVehicleSuccessMessage = "Vehicle successfully added!"; // Success message
+            }
+            else
+            {
+                addVehicleErrorMessage = "Error adding vehicle."; // Error message
+            }
+        }
+        catch (Exception e)
+        {
+            addVehicleErrorMessage = $"Error adding vehicle: {e.Message}"; // Error message
+        }
+    }
+}
