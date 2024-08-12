@@ -1,0 +1,128 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "G:\\mechanic_database_backend\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|g:\\mechanic_database_backend\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|G:\\mechanic_database_backend\\invoice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:invoice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|G:\\mechanic_database_backend\\populate-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:populate-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|G:\\mechanic_database_backend\\databaseinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:databaseinfo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|G:\\mechanic_database_backend\\appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:appointment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|G:\\mechanic_database_backend\\create-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:create-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|g:\\mechanic_database_backend\\populate-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:populate-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|g:\\mechanic_database_backend\\create-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame",
+      "RelativeMoniker": "D:0:0:{FD64A966-0FC6-41E8-866A-1EB6625DF601}|mechanic_database.csproj|solutionrelative:create-mechanic-database.sql||{CC5D8DF0-88F4-4BB2-9DBB-B48CEE65C30A}|CodeFrame"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Program.cs",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\Program.cs",
+              "RelativeDocumentMoniker": "Program.cs",
+              "ToolTip": "G:\\mechanic_database_backend\\Program.cs",
+              "RelativeToolTip": "Program.cs",
+              "ViewState": "AQIAAJUBAAAAAAAAAAAYwLEBAABVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-11T23:05:43.703Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "create-mechanic-database.sql ",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\create-mechanic-database.sql",
+              "RelativeDocumentMoniker": "create-mechanic-database.sql",
+              "ToolTip": "G:\\mechanic_database_backend\\create-mechanic-database.sql",
+              "RelativeToolTip": "create-mechanic-database.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-08-09T23:22:41.265Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "populate-mechanic-database.sql ",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\populate-mechanic-database.sql",
+              "RelativeDocumentMoniker": "populate-mechanic-database.sql",
+              "ToolTip": "G:\\mechanic_database_backend\\populate-mechanic-database.sql",
+              "RelativeToolTip": "populate-mechanic-database.sql",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000826|",
+              "WhenOpened": "2024-08-05T22:19:50.945Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "databaseInfo.cs",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\databaseInfo.cs",
+              "RelativeDocumentMoniker": "databaseInfo.cs",
+              "ToolTip": "G:\\mechanic_database_backend\\databaseInfo.cs",
+              "RelativeToolTip": "databaseInfo.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABgAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-08T16:10:39.275Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Invoice.cs",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\Invoice.cs",
+              "RelativeDocumentMoniker": "Invoice.cs",
+              "ToolTip": "G:\\mechanic_database_backend\\Invoice.cs",
+              "RelativeToolTip": "Invoice.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAkAAAAFAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-07T18:27:37.561Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Appointment.cs",
+              "DocumentMoniker": "G:\\mechanic_database_backend\\Appointment.cs",
+              "RelativeDocumentMoniker": "Appointment.cs",
+              "ToolTip": "G:\\mechanic_database_backend\\Appointment.cs",
+              "RelativeToolTip": "Appointment.cs",
+              "ViewState": "AQIAAAQAAAAAAAAAAAAowAgAAAAeAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-07T18:27:35.677Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
